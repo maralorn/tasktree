@@ -1,5 +1,5 @@
 [package]
-name = "tasklist"
+name = "tasktree"
 version = "0.1.0"
 authors = ["Malte Brandy <malte.brandy@maralorn.de>"]
 
