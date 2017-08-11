@@ -31,7 +31,6 @@ git clone https://github.com/maralorn/tasktree
 cd tasktree
 cargo install
 ```
-Add `$HOME/.cargo/bin/` to your path.
 
 ### Configure Taskwarrior
 
@@ -43,9 +42,14 @@ uda.partof.label=Part of
 (If you don’t do this you will get a lot of garbage in descriptions, when you try to create a tree. Otherwise you can use the tool without this. But then you have a task list, not a tree.)
 
 ### Run
+
+
+Make sure `$HOME/.cargo/bin/` is in your path.
+
 ```
 tasktree
 ```
+(You can also just hit it with `cargo run` in the repo.)
 
 ## MIT License
 
