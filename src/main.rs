@@ -75,7 +75,7 @@ impl TaskTreeState {
             self.positions.clear();
             self.treestore.clear();
             self.tasks.refresh()?;
-            for task in task::get_tasks(&(self.filterbuffer.get_text() + " +PENDING"))? {
+            for task in task::get_tasks(&self.filterbuffer.get_text())? {
                 self.show_task(&task)?;
             }
             Ok(())
