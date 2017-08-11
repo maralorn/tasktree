@@ -1,6 +1,6 @@
 # Tasktree
 
-This tool shows your taskwarrior tasks in a tree by introducing a new `partof` uda.
+This tool shows your [taskwarrior](https://taskwarrior.org) tasks in a tree by introducing a new `partof` uda.
 
 ## Features
 
