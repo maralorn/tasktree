@@ -5,11 +5,12 @@ This tool shows your [taskwarrior](https://taskwarrior.org) tasks in a tree by i
 ## Features
 
 * Showing arbitrary queries to taskwarrior (refresh by hitting enter)
-* Showing task properties: `description, status, tags, project, due, wait`
+* Showing task properties: `description, status, tags, project, due, wait, entry, modified`
 * Sort your tasks in a tree structure with drag and drop
 * Delete/Undelete by setting checkbox
 * Complete/Uncomplete by setting checkbox
 * Create new task by filling new child field
+* Edit task descriptions
 
 I do not promise, that there will come any more features. But a lot comes to mind. Pull requests welcome.
 
