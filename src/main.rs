@@ -235,9 +235,12 @@ fn main() {
                         }
                         None => None,
                     };
-
-                    task::partof(&uuid, parent.as_ref())?;
-                    app.tasks.update(&uuid).map(|_|())
+                    if app.tasks.get_task(&uuid)?.partof != parent {
+                        task::partof(&uuid, parent.as_ref())?;
+                        app.tasks.update(&uuid).map(|_| ())
+                    } else {
+                        Ok(())
+                    }
                 });
             },
         );
