@@ -28,9 +28,9 @@
     </columns>
   </object>
   <object class="GtkApplicationWindow" id="mainwindow">
+    <property name="title">Tasktree</property>
     <property name="name">Tasktree</property>
     <property name="can_focus">False</property>
-    <property name="role">s</property>
     <property name="icon_name">task-due</property>
     <child>
       <object class="GtkScrolledWindow">
