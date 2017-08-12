@@ -82,13 +82,21 @@ impl TaskTreeState {
 
         });
     }
-    pub fn update(&mut self, uuid: &uuid::Uuid) -> Result<()> {
+    /// This function will update the app cache and the task cache for a changed task.
+    /// If you pass a `TreeIter` it will just assume that the display is already correct and save
+    /// it to the cache. If you don’t it will refresh the line.
+    pub fn update(&mut self, uuid: &uuid::Uuid, new_iter: Option<&gtk::TreeIter>) -> Result<()> {
         self.tasks.update(uuid)?;
-        let iter = self.positions.remove(uuid).ok_or(
-            "trying to update task with unknown position",
-        )?;
-        self.treestore.remove(&iter);
-        self.show_task(uuid).map(|_| ())
+        if let Some(new_iter) = new_iter {
+            self.positions.insert(*uuid, new_iter.clone());
+        } else {
+            let iter = self.positions.remove(uuid).ok_or(
+                "trying to update task with unknown position",
+            )?;
+            self.treestore.remove(&iter);
+            self.show_task(uuid)?;
+        }
+        Ok(())
     }
 }
 
@@ -150,7 +158,7 @@ fn main() {
                 TaskStatus::Waiting => task::done(&uuid)?,
                 TaskStatus::Deleted => (),
             };
-            app.update(&uuid)
+            app.update(&uuid, None)
         });
     });
     let app_pointer = app.clone();
@@ -173,7 +181,7 @@ fn main() {
                 TaskStatus::Waiting => task::delete(&uuid)?,
                 TaskStatus::Deleted => task::pending(&uuid)?,
             };
-            app.update(&uuid)
+            app.update(&uuid, None)
         });
     });
     let app_pointer = app.clone();
@@ -207,7 +215,7 @@ fn main() {
             )?;
             let uuid = uuid::Uuid::parse_str(uuid_str)?;
             task::set_description(&uuid, description.to_string())?;
-            app.update(&uuid)
+            app.update(&uuid, Some(&iter))
         });
     });
     util::run(|| {
@@ -237,7 +245,7 @@ fn main() {
                     };
                     if app.tasks.get_task(&uuid)?.partof != parent {
                         task::partof(&uuid, parent.as_ref())?;
-                        app.tasks.update(&uuid).map(|_| ())
+                        app.update(&uuid, Some(iter))
                     } else {
                         Ok(())
                     }
