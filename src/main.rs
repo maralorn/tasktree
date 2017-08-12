@@ -39,7 +39,7 @@ impl TaskTreeState {
         let iter = self.treestore.insert_with_values(
             partof_iter.as_ref(),
             None,
-            &[0, 1, 2, 3, 4, 5, 6, 7, 8],
+            &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             &[
                 &task.uuid.to_string(),
                 &task.description,
@@ -62,6 +62,11 @@ impl TaskTreeState {
                     None => "".to_string(),
                 },
                 &match task.wait {
+                    Some(ref date) => date.format("%F %R").to_string(),
+                    None => "".to_string(),
+                },
+                &task.entry.format("%F %R").to_string(),
+                &match task.modified {
                     Some(ref date) => date.format("%F %R").to_string(),
                     None => "".to_string(),
                 },

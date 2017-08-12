@@ -25,12 +25,16 @@
       <column type="gchararray"/>
       <!-- column-name wait -->
       <column type="gchararray"/>
+      <!-- column-name entry -->
+      <column type="gchararray"/>
+      <!-- column-name modified -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkApplicationWindow" id="mainwindow">
-    <property name="title">Tasktree</property>
     <property name="name">Tasktree</property>
     <property name="can_focus">False</property>
+    <property name="title">Tasktree</property>
     <property name="icon_name">task-due</property>
     <child>
       <object class="GtkScrolledWindow">
@@ -73,6 +77,30 @@
               <object class="GtkTreeViewColumn">
                 <property name="resizable">True</property>
                 <property name="sizing">fixed</property>
+                <property name="title" translatable="yes">Edit</property>
+                <child>
+                  <object class="GtkCellRendererText" id="new-child-cell">
+                    <property name="editable">True</property>
+                    <property name="placeholder_text">New child</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">autosize</property>
+                <property name="title" translatable="yes">Deleted</property>
+                <child>
+                  <object class="GtkCellRendererToggle" id="deleted-cell"/>
+                  <attributes>
+                    <attribute name="active">4</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">autosize</property>
                 <property name="title" translatable="yes">Status</property>
                 <child>
                   <object class="GtkCellRendererText" id="status-cell"/>
@@ -114,8 +142,7 @@
             </child>
             <child>
               <object class="GtkTreeViewColumn">
-                <property name="resizable">True</property>
-                <property name="sizing">fixed</property>
+                <property name="sizing">autosize</property>
                 <property name="title" translatable="yes">Due</property>
                 <child>
                   <object class="GtkCellRendererText" id="due-cell">
@@ -129,8 +156,7 @@
             </child>
             <child>
               <object class="GtkTreeViewColumn">
-                <property name="resizable">True</property>
-                <property name="sizing">fixed</property>
+                <property name="sizing">autosize</property>
                 <property name="title" translatable="yes">Wait</property>
                 <child>
                   <object class="GtkCellRendererText" id="wait-cell">
@@ -144,27 +170,25 @@
             </child>
             <child>
               <object class="GtkTreeViewColumn">
-                <property name="resizable">True</property>
-                <property name="sizing">fixed</property>
-                <property name="title" translatable="yes">Deleted</property>
+                <property name="sizing">autosize</property>
+                <property name="title" translatable="yes">Entry</property>
                 <child>
-                  <object class="GtkCellRendererToggle" id="deleted-cell"/>
+                  <object class="GtkCellRendererText" id="entry-cell"/>
                   <attributes>
-                    <attribute name="active">4</attribute>
+                    <attribute name="text">9</attribute>
                   </attributes>
                 </child>
               </object>
             </child>
             <child>
               <object class="GtkTreeViewColumn">
-                <property name="resizable">True</property>
-                <property name="sizing">fixed</property>
-                <property name="title" translatable="yes">Edit</property>
+                <property name="sizing">autosize</property>
+                <property name="title" translatable="yes">Modified</property>
                 <child>
-                  <object class="GtkCellRendererText" id="new-child-cell">
-                    <property name="editable">True</property>
-                    <property name="placeholder_text">New child</property>
-                  </object>
+                  <object class="GtkCellRendererText" id="modified-cell"/>
+                  <attributes>
+                    <attribute name="text">10</attribute>
+                  </attributes>
                 </child>
               </object>
             </child>
