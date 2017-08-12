@@ -169,3 +169,11 @@ pub fn partof(uuid: &uuid::Uuid, partof: Option<&uuid::Uuid>) -> util::Result<()
         .output()?;
     Ok(())
 }
+pub fn set_description(uuid: &uuid::Uuid, description: String) -> util::Result<()> {
+    &std::process::Command::new("task")
+        .arg(format!("uuid:{}", uuid))
+        .arg("mod")
+        .arg(format!("description:\"{}\"", description))
+        .output()?;
+    Ok(())
+}

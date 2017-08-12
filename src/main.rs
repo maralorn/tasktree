@@ -193,6 +193,23 @@ fn main() {
             app.show_task(&new_task).map(|_| ())
         });
     });
+    let app_pointer = app.clone();
+    let description_cell: gtk::CellRendererText = builder.get_object("description-cell").unwrap();
+    description_cell.connect_edited(move |_, treepath, description| if description.len() > 0 {
+        util::run(|| {
+            let mut app = app_pointer.try_borrow_mut()?;
+            let iter = app.treestore.get_iter(&treepath).ok_or(
+                "Treepath didn’t give us an Iter",
+            )?;
+            let uuid_val = app.treestore.get_value(&iter, 0);
+            let uuid_str = uuid_val.get().ok_or(
+                "Didn’t get correct uuid_str from treestore",
+            )?;
+            let uuid = uuid::Uuid::parse_str(uuid_str)?;
+            task::set_description(&uuid, description.to_string())?;
+            app.update(&uuid)
+        });
+    });
     util::run(|| {
         let mut borrowed_app = app.try_borrow_mut()?;
         let app_pointer = app.clone();
