@@ -1,18 +1,18 @@
-use uuid;
+use uuid::Uuid;
 use task_hookrs::*;
 use serde_json;
-use util;
+use util::Result;
 use std;
 use regex;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Task {
     pub status: status::TaskStatus,
-    pub uuid: uuid::Uuid,
+    pub uuid: Uuid,
     pub entry: date::Date,
     pub description: String,
 
-    pub partof: Option<uuid::Uuid>,
+    pub partof: Option<Uuid>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Vec<annotation::Annotation>>,
@@ -63,17 +63,13 @@ pub struct Task {
 }
 
 pub struct TaskCache {
-    tasks: std::collections::HashMap<uuid::Uuid, Task>,
+    tasks: std::collections::HashMap<Uuid, Task>,
 }
 impl TaskCache {
     pub fn new() -> Self {
         TaskCache { tasks: std::collections::HashMap::new() }
     }
-    pub fn create(
-        &mut self,
-        description: String,
-        partof: Option<&uuid::Uuid>,
-    ) -> util::Result<&Task> {
+    pub fn create(&mut self, description: String, partof: Option<&Uuid>) -> Result<&Task> {
         lazy_static! {
             static ref UUID_RE: regex::Regex = regex::Regex::new("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").unwrap();
         }
@@ -91,39 +87,41 @@ impl TaskCache {
             .captures_iter(std::str::from_utf8(&stdout)?)
             .next()
             .ok_or("No uuid in task feedback found")?;
-        self.update(&uuid::Uuid::parse_str(&uuid_match[0])?)
+        self.update(&Uuid::parse_str(&uuid_match[0])?)
     }
-    pub fn refresh(&mut self) -> util::Result<()> {
+    pub fn refresh(&mut self) -> Result<()> {
         let stdout = &std::process::Command::new("task")
             .arg("export")
             .stdout(std::process::Stdio::piped())
             .output()?
             .stdout;
-        let tasks: Vec<Task> = serde_json::from_str(std::str::from_utf8(stdout)?)?;
-        for task in tasks {
+        for task in serde_json::from_str::<Vec<Task>>(std::str::from_utf8(stdout)?)? {
             self.tasks.insert(task.uuid, task);
         }
         Ok(())
     }
-    pub fn get_task(&self, uuid: &uuid::Uuid) -> util::Result<&Task> {
+    pub fn get_task(&self, uuid: &Uuid) -> Result<&Task> {
         Ok(self.tasks.get(uuid).ok_or("Uuid not found in Cache")?)
     }
-    pub fn update(&mut self, uuid: &uuid::Uuid) -> util::Result<&Task> {
+    pub fn update(&mut self, uuid: &Uuid) -> Result<&Task> {
         let stdout = &std::process::Command::new("task")
             .arg("export")
             .arg(format!("uuid:{}", uuid))
             .stdout(std::process::Stdio::piped())
             .output()?
             .stdout;
-        let tasks: Vec<Task> = serde_json::from_str(std::str::from_utf8(stdout)?)?;
-        for task in tasks {
-            self.tasks.insert(*uuid, task);
-            return Ok(self.tasks.get(uuid).unwrap());
-        }
-        Err("Could not load Task!")?
+        let task = serde_json::from_str::<Vec<Task>>(std::str::from_utf8(stdout)?)?
+            .into_iter()
+            .next()
+            .ok_or("Could not load Task!")?;
+        self.tasks.insert(*uuid, task);
+        Ok(self.tasks.get(uuid).unwrap())
+    }
+    pub fn get_project_name(self, uuid: &Uuid) -> Result<&str> {
+        Err("Mist")?
     }
 }
-pub fn get_tasks(query: &str) -> util::Result<Vec<uuid::Uuid>> {
+pub fn get_tasks(query: &str) -> Result<Vec<Uuid>> {
     let stdout = &std::process::Command::new("task")
         .arg("_uuid")
         .arg(query)
@@ -131,18 +129,18 @@ pub fn get_tasks(query: &str) -> util::Result<Vec<uuid::Uuid>> {
         .stdout;
     let mut tasks = vec![];
     for uuid_str in std::str::from_utf8(stdout)?.split_whitespace() {
-        tasks.push(uuid::Uuid::parse_str(uuid_str)?)
+        tasks.push(Uuid::parse_str(uuid_str)?)
     }
     Ok(tasks)
 }
-pub fn done(uuid: &uuid::Uuid) -> util::Result<()> {
+pub fn done(uuid: &Uuid) -> Result<()> {
     &std::process::Command::new("task")
         .arg(format!("uuid:{}", uuid))
         .arg("done")
         .output()?;
     Ok(())
 }
-pub fn delete(uuid: &uuid::Uuid) -> util::Result<()> {
+pub fn delete(uuid: &Uuid) -> Result<()> {
     &std::process::Command::new("task")
         .arg(format!("uuid:{}", uuid))
         .arg("delete")
@@ -150,7 +148,7 @@ pub fn delete(uuid: &uuid::Uuid) -> util::Result<()> {
         .output()?;
     Ok(())
 }
-pub fn pending(uuid: &uuid::Uuid) -> util::Result<()> {
+pub fn pending(uuid: &Uuid) -> Result<()> {
     &std::process::Command::new("task")
         .arg(format!("uuid:{}", uuid))
         .arg("mod")
@@ -158,7 +156,7 @@ pub fn pending(uuid: &uuid::Uuid) -> util::Result<()> {
         .output()?;
     Ok(())
 }
-pub fn partof(uuid: &uuid::Uuid, partof: Option<&uuid::Uuid>) -> util::Result<()> {
+pub fn partof(uuid: &Uuid, partof: Option<&Uuid>) -> Result<()> {
     &std::process::Command::new("task")
         .arg(format!("uuid:{}", uuid))
         .arg("mod")
@@ -169,7 +167,7 @@ pub fn partof(uuid: &uuid::Uuid, partof: Option<&uuid::Uuid>) -> util::Result<()
         .output()?;
     Ok(())
 }
-pub fn set_description(uuid: &uuid::Uuid, description: String) -> util::Result<()> {
+pub fn set_description(uuid: &Uuid, description: String) -> Result<()> {
     &std::process::Command::new("task")
         .arg(format!("uuid:{}", uuid))
         .arg("mod")
