@@ -1,4 +1,5 @@
 extern crate gtk;
+extern crate glib;
 extern crate gdk;
 extern crate task_hookrs;
 extern crate uuid;
@@ -13,17 +14,20 @@ extern crate regex;
 
 mod util;
 mod task;
-use util::Result;
+use util::{run, Result};
+use gtk::prelude::*;
+use task_hookrs::status::TaskStatus;
+use uuid::Uuid;
 
 struct TaskTreeState {
     treestore: gtk::TreeStore,
     filterbuffer: gtk::EntryBuffer,
     tasks: task::TaskCache,
-    positions: std::collections::HashMap<uuid::Uuid, gtk::TreeIter>,
+    positions: std::collections::HashMap<Uuid, gtk::TreeIter>,
 }
 
 impl TaskTreeState {
-    fn show_task(&mut self, uuid: &uuid::Uuid) -> Result<gtk::TreeIter> {
+    fn show_task(&mut self, uuid: &Uuid) -> Result<gtk::TreeIter> {
         if let Some(position) = self.positions.get(uuid) {
             return Ok(position.clone());
         }
@@ -35,7 +39,6 @@ impl TaskTreeState {
         };
         let task = self.tasks.get_task(uuid)?;
 
-        use task_hookrs::status::TaskStatus;
         let iter = self.treestore.insert_with_values(
             partof_iter.as_ref(),
             None,
@@ -107,8 +110,6 @@ impl TaskTreeState {
 
 fn main() {
 
-    use gtk::{WidgetExt, TreeModelExt, CellRendererTextExt};
-
     if gtk::init().is_err() {
         return println!("Failed to initialize GTK.");
     }
@@ -144,7 +145,6 @@ fn main() {
     });
     let app_pointer = app.clone();
     let done_cell: gtk::CellRendererToggle = builder.get_object("done-cell").unwrap();
-    use task_hookrs::status::TaskStatus;
     done_cell.connect_toggled(move |_, treepath| {
         util::run(|| {
             let mut app = app_pointer.try_borrow_mut()?;
@@ -155,7 +155,7 @@ fn main() {
             let uuid_str = uuid_val.get().ok_or(
                 "Didn’t get correct uuid_str from treestore",
             )?;
-            let uuid = uuid::Uuid::parse_str(uuid_str)?;
+            let uuid = Uuid::parse_str(uuid_str)?;
             match app.tasks.get_task(&uuid)?.status {
                 TaskStatus::Completed => task::pending(&uuid)?,
                 TaskStatus::Pending => task::done(&uuid)?,
@@ -192,7 +192,7 @@ fn main() {
     let app_pointer = app.clone();
     let new_child_cell: gtk::CellRendererText = builder.get_object("new-child-cell").unwrap();
     new_child_cell.connect_edited(move |_, treepath, description| if description.len() > 0 {
-        util::run(|| {
+        run(|| {
             let mut app = app_pointer.try_borrow_mut()?;
             let iter = app.treestore.get_iter(&treepath).ok_or(
                 "Treepath didn’t give us an Iter",
@@ -209,8 +209,8 @@ fn main() {
     let app_pointer = app.clone();
     let description_cell: gtk::CellRendererText = builder.get_object("description-cell").unwrap();
     description_cell.connect_edited(move |_, treepath, description| if description.len() > 0 {
-        util::run(|| {
-            let mut app = app_pointer.try_borrow_mut()?;
+        run(|| {
+            let app = app_pointer.try_borrow()?;
             let iter = app.treestore.get_iter(&treepath).ok_or(
                 "Treepath didn’t give us an Iter",
             )?;
@@ -219,8 +219,12 @@ fn main() {
                 "Didn’t get correct uuid_str from treestore",
             )?;
             let uuid = uuid::Uuid::parse_str(uuid_str)?;
-            task::set_description(&uuid, description.to_string())?;
-            app.update(&uuid, Some(&iter))
+            let app_pointer = app_pointer.clone();
+            gtk::idle_add(move || {
+                run(|| app_pointer.try_borrow_mut()?.update(&uuid, None));
+                glib::Continue(false)
+            });
+            task::set_description(&uuid, description.to_string())
         });
     });
     util::run(|| {
@@ -228,7 +232,7 @@ fn main() {
         let app_pointer = app.clone();
         borrowed_app.treestore.connect_row_changed(
             move |_, _, iter| {
-                util::run(|| {
+                run(|| {
                     let mut app = match app_pointer.try_borrow_mut() {
                         Ok(app) => app,
                         Err(_) => return Ok(()), // This propably means, that we are inside show_task
