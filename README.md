@@ -12,7 +12,7 @@ This tool shows your [taskwarrior](https://taskwarrior.org) tasks in a tree by i
 * Create new task by filling new child field
 * Edit task descriptions
 
-I do not promise, that there will come any more features. But a lot comes to mind. Pull requests welcome.
+I do not promise that there will come any more features. But a lot comes to mind. Pull requests welcome.
 
 ## Install
 ### Build Requirements
@@ -40,7 +40,7 @@ Add these two lines to your `.taskrc`.
 uda.partof.type=string
 uda.partof.label=Part of
 ```
-(If you don’t do this you will get a lot of garbage in descriptions, when you try to create a tree. Otherwise you can use the tool without this. But then you have a task list, not a tree.)
+(If you don’t do this, you will get a lot of garbage in descriptions when you try to create a tree. Otherwise, you can use the tool without this. But then you have a task list, not a tree.)
 
 ### Run
 
