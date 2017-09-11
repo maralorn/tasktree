@@ -202,7 +202,7 @@ fn main() {
                 "Didn’t get correct uuid_str from treestore",
             )?;
             let uuid = uuid::Uuid::parse_str(uuid_str)?;
-            let new_task = app.tasks.create(description.to_string(), Some(&uuid))?.uuid;
+            let new_task = app.tasks.create(description, Some(&uuid))?.uuid;
             app.show_task(&new_task).map(|_| ())
         });
     });
@@ -224,7 +224,7 @@ fn main() {
                 run(|| app_pointer.try_borrow_mut()?.update(&uuid, None));
                 glib::Continue(false)
             });
-            task::set_description(&uuid, description.to_string())
+            task::set_description(&uuid, description)
         });
     });
     util::run(|| {
