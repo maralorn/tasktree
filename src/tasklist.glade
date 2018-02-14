@@ -199,15 +199,25 @@
       </object>
     </child>
     <child type="titlebar">
-      <object class="GtkSearchEntry" id="filterfield">
+      <object class="GtkHeaderBar" id="filterbar">
         <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hexpand">True</property>
-        <property name="buffer">filterbuffer</property>
-        <property name="primary_icon_name">edit-find-symbolic</property>
-        <property name="primary_icon_activatable">False</property>
-        <property name="primary_icon_sensitive">False</property>
-        <property name="placeholder_text" translatable="yes">Filter</property>
+        <property name="can_focus">False</property>
+        <property name="title">Tasktree</property>
+        <property name="subtitle">A tree viewer for your taskwarrior tasks</property>
+        <property name="spacing">10</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkSearchEntry" id="filterfield">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hexpand">True</property>
+            <property name="buffer">filterbuffer</property>
+            <property name="primary_icon_name">edit-find-symbolic</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="primary_icon_sensitive">False</property>
+            <property name="placeholder_text" translatable="yes">Enter Task Filter …</property>
+          </object>
+        </child>
       </object>
     </child>
   </object>
