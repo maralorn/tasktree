@@ -113,6 +113,7 @@ fn main() {
     if gtk::init().is_err() {
         return println!("Failed to initialize GTK.");
     }
+    gdk::set_program_class("Tasktree");
     // First we get the file content.
     let glade_src = include_str!("tasklist.glade");
     // Then we call the Builder call.
