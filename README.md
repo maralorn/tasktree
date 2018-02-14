@@ -52,6 +52,10 @@ tasktree
 ```
 (You can also just hit it with `cargo run` in the repo.)
 
+## Credits
+
+Icon made by [Freepik](www.freepik.com) from www.flaticon.com 
+
 ## MIT License
 
 Copyright 2017 Malte Brandy

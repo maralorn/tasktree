@@ -37,7 +37,7 @@
     <property name="title">Tasktree</property>
     <property name="default_width">960</property>
     <property name="default_height">1080</property>
-    <property name="icon_name">task-due</property>
+    <property name="icon_name">tasktree</property>
     <child>
       <object class="GtkScrolledWindow">
         <property name="visible">True</property>
