@@ -23,7 +23,7 @@ I do not promise that there will come any more features. But a lot comes to mind
 ### Run Requirements
 
 * taskwarrior >= 2.5
-* gtk >=3.22
+* gtk >=3.18
 
 ### Install
 
