@@ -1,3 +1,5 @@
+**WARNING: This tool is unmaintained and may eat all your tasks. Please note, that it has the intended behaviour of overriding the `project` field of your tasks.**
+
 # Tasktree
 
 This tool shows your [taskwarrior](https://taskwarrior.org) tasks in a tree by introducing a new `partof` uda.
